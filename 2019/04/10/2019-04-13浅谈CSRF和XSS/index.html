@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+    <meta name="keywords" content="Sheldon">
+  
+  
+    <meta name="description" content="Sheldon">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    
+    Sheldon</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-2019-04-13浅谈CSRF和XSS" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+
+    
+      <div class="article-meta">
+        <a href="/2019/04/10/2019-04-13浅谈CSRF和XSS/" class="article-date">
+  <time datetime="2019-04-10T12:59:07.000Z" itemprop="datePublished">2019-04-10</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+      
+
+      
+        <h1 id="浅谈CSRF和XSS"><a href="#浅谈CSRF和XSS" class="headerlink" title="浅谈CSRF和XSS"></a>浅谈CSRF和XSS</h1><ul>
+<li><h2 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h2></li>
+</ul>
+<ul>
+<li><h3 id="CSRF的基本概念、缩写、全称"><a href="#CSRF的基本概念、缩写、全称" class="headerlink" title="CSRF的基本概念、缩写、全称"></a>CSRF的基本概念、缩写、全称</h3></li>
+</ul>
+<blockquote>
+<p><code>CSRF</code>（<code>Cross-site request forgery</code>）：<strong>跨站请求伪造</strong>。</p>
+</blockquote>
+<ul>
+<li><h3 id="CSRF的攻击原理"><a href="#CSRF的攻击原理" class="headerlink" title="CSRF的攻击原理"></a>CSRF的攻击原理</h3></li>
+</ul>
+<p><img src="http://img.smyhvae.com/20180307_1735.png" alt></p>
+<blockquote>
+<a id="more"></a>
+<p>用户是网站A的注册用户，且登录进去，于是网站A就给用户下发<code>cookie</code>。</p>
+</blockquote>
+<blockquote>
+<p>从上图可以看出，要完成一次<code>CSRF</code>攻击，受害者必须满足两个必要的条件：</p>
+</blockquote>
+<ol>
+<li>登录受信任网站<code>A</code>，并在本地生成<code>Cookie</code>。（如果用户没有登录网站<code>A</code>，那么网站<code>B</code>在诱导的时候，请求网站<code>A</code>的<code>api</code>接口时，会提示你登录）</li>
+<li>在不登出<code>A</code>的情况下，访问危险网站<code>B</code>（其实是利用了网站<code>A</code>的漏洞）。</li>
+</ol>
+<blockquote>
+<p>温馨提示一下，<code>cookie</code>保证了用户可以处于登录状态，但网站<code>B</code>其实拿不到 <code>cookie</code>。</p>
+</blockquote>
+<blockquote>
+<p>举个例子，前段时间里，微博网站有个<code>api</code>接口有漏洞，导致很多用户的粉丝暴增。</p>
+</blockquote>
+<ul>
+<li><h3 id="CSRF如何防御"><a href="#CSRF如何防御" class="headerlink" title="CSRF如何防御"></a>CSRF如何防御</h3></li>
+</ul>
+<p><strong>方法一、Token 验证：</strong>（用的最多）</p>
+<ol>
+<li>服务器发送给客户端一个<code>token</code>；</li>
+<li>客户端提交的表单中带着这个<code>token</code>。</li>
+<li>如果这个 <code>token</code> 不合法，那么服务器拒绝这个请求。</li>
+</ol>
+<p><strong>方法二：隐藏令牌：</strong></p>
+<ul>
+<li>把 <code>token</code> 隐藏在 <code>http</code> 的 <code>head</code>头中。</li>
+</ul>
+<blockquote>
+<p>方法二和方法一有点像，本质上没有太大区别，只是使用方式上有区别。</p>
+</blockquote>
+<p><strong>方法三、Referer 验证：</strong></p>
+<blockquote>
+<p><code>Referer</code> 指的是页面请求来源。意思是，<strong>只接受本站的请求，服务器才做响应</strong>；如果不是，就拦截。</p>
+</blockquote>
+<ul>
+<li><h2 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h2></li>
+</ul>
+<ul>
+<li><h3 id="XSS的基本概念"><a href="#XSS的基本概念" class="headerlink" title="XSS的基本概念"></a>XSS的基本概念</h3></li>
+</ul>
+<blockquote>
+<p><code>XSS（Cross Site Scripting）`</code>：<strong>跨域脚本攻击</strong>。</p>
+</blockquote>
+<ul>
+<li><h3 id="XSS的攻击原理"><a href="#XSS的攻击原理" class="headerlink" title="XSS的攻击原理"></a>XSS的攻击原理</h3></li>
+</ul>
+<blockquote>
+<p><code>XSS</code>攻击的核心原理是：不需要你做任何的登录认证，它会通过合法的操作（比如在<code>url</code>中输入、在评论框中输入），向你的页面注入脚本（可能是<code>js</code>、<code>hmtl</code>代码块等）。</p>
+</blockquote>
+<blockquote>
+<p>最后导致的结果可能是：</p>
+</blockquote>
+<ul>
+<li><p>盗用<code>Cookie</code></p>
+</li>
+<li><p>破坏页面的正常结构，插入广告等恶意内容</p>
+</li>
+<li><p><code>D-doss</code>攻击</p>
+</li>
+</ul>
+<ul>
+<li><h3 id="XSS的攻击方式"><a href="#XSS的攻击方式" class="headerlink" title="XSS的攻击方式"></a>XSS的攻击方式</h3></li>
+</ul>
+<ol>
+<li>反射型</li>
+</ol>
+<blockquote>
+<p>发出请求时，<code>XSS</code>代码出现在<code>url</code>中，作为输入提交到服务器端，服务器端解析后响应，<code>XSS</code>代码随响应内容一起传回给浏览器，最后浏览器解析执行<code>XSS</code>代码。这个过程像一次反射，所以叫反射型<code>XSS</code>。</p>
+</blockquote>
+<ol start="2">
+<li>存储型</li>
+</ol>
+<blockquote>
+<p>存储型<code>XSS</code>和反射型<code>XSS</code>的差别在于，提交的代码会存储在服务器端（数据库、内存、文件系统等），下次请求时目标页面时不用再提交XSS代码。</p>
+</blockquote>
+<ul>
+<li><h3 id="XSS的防范措施（encode-过滤）"><a href="#XSS的防范措施（encode-过滤）" class="headerlink" title="XSS的防范措施（encode + 过滤）"></a>XSS的防范措施（encode + 过滤）</h3></li>
+</ul>
+<p><strong>XSS的防范措施主要有三个：</strong></p>
+<p><strong>1. 编码</strong>：</p>
+<blockquote>
+<p>对用户输入的数据进行<code>HTML Entity</code>编码。</p>
+</blockquote>
+<p>如上图所示，把字符转换成 转义字符。</p>
+<blockquote>
+<p><code>Encode</code>的作用是将<code>$var</code>等一些字符进行转化，使得浏览器在最终输出结果上是一样的。</p>
+</blockquote>
+<p>比如说这段代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined">alert(1)</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>若不进行任何处理，则浏览器会执行alert的js操作，实现XSS注入。</p>
+</blockquote>
+<blockquote>
+<p>进行编码处理之后，L在浏览器中的显示结果就是<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>，实现了将<code></code>$var<code>作为纯文本进行输出，且不引起J</code>avaScript`的执行。</p>
+</blockquote>
+<p><strong>2、过滤：</strong></p>
+<ul>
+<li>移除用户输入的和事件相关的属性。如<code>onerror</code>可以自动触发攻击，还有<code>onclick</code>等。（总而言是，过滤掉一些不安全的内容）</li>
+<li>移除用户输入的<code>Style</code>节点、<code>Script</code>节点、<code>Iframe</code>节点。（尤其是<code>Script</code>节点，它可是支持跨域的呀，一定要移除）。</li>
+</ul>
+<p><strong>3、校正</strong></p>
+<ul>
+<li>避免直接对<code>HTML Entity</code>进行解码。</li>
+<li>使用<code>DOM Parse</code>转换，校正不配对的<code>DOM</code>标签。</li>
+</ul>
+<blockquote>
+<p>备注：我们应该去了解一下<code>DOM Parse</code>这个概念，它的作用是把文本解析成<code>DOM</code>结构。</p>
+</blockquote>
+<p>比较常用的做法是，通过第一步的编码转成文本，然后第三步转成<code>DOM</code>对象，然后经过第二步的过滤。</p>
+<ul>
+<li><h2 id="CSRF-和-XSS-的区别"><a href="#CSRF-和-XSS-的区别" class="headerlink" title="CSRF 和 XSS 的区别"></a>CSRF 和 XSS 的区别</h2></li>
+</ul>
+<p><strong>区别一：</strong></p>
+<ul>
+<li><code>CSRF</code>：需要用户先登录网站<code>A</code>，获取 <code>cookie</code></li>
+<li><code>XSS</code>：不需要登录。</li>
+</ul>
+<p><strong>区别二：（原理的区别）</strong></p>
+<ul>
+<li><code>CSRF</code>：是利用网站<code>A</code>本身的漏洞，去请求网站<code>A</code>的<code>api</code>。</li>
+<li><code>XSS</code>：是向网站 <code>A</code> 注入 <code>JS</code>代码，然后执行 <code>JS</code> 里的代码，篡改网站<code>A</code>的内容。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/04/10/2019-04-13浅谈CSRF和XSS/" data-id="cjuecm4g40005y813em58414n" class="article-share-link">Share</a>
+      
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2019/04/13/2019-04-12使用webpack构建多页应用/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer posts</strong>
+        <div class="article-nav-title">
+          
+            (no title)
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/02/22/2017-02-22-使用-.gitignore-忽略-git-仓库中的文件/" class="article-nav-link">
+        <strong class="article-nav-caption">Olde posts</strong>
+        <div class="article-nav-title">使用 .gitignore 忽略 Git 仓库中的文件</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  <div class="gitalk" id="gitalk-container"></div>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: '',
+      clientSecret: '',
+      repo: '',
+      owner: '',
+      admin: [''],
+      // id: location.pathname,      // Ensure uniqueness and length less than 50
+      id: md5(location.pathname),
+      distractionFreeMode: false,  // Facebook-like distraction free mode
+      pagerDirection: 'last'
+    })
+
+  gitalk.render('gitalk-container')
+  </script>
+
+  
+
+</article>
+
+
+
+</section>
+  <footer class="footer">
+  
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2019 Sheldon</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="Sheldon"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

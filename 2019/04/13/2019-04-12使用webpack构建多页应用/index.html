@@ -7,7 +7,7 @@
     <meta name="keywords" content="Sheldon">
   
   
-    <meta name="description" content="运动">
+    <meta name="description" content="Sheldon">
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>
@@ -46,12 +46,20 @@
       
 
       
-        <h1 id="使用webpack构建多页应用"><a href="#使用webpack构建多页应用" class="headerlink" title="使用webpack构建多页应用"></a>使用webpack构建多页应用</h1><p>##背景</p>
+        <h1 id="使用webpack构建多页应用"><a href="#使用webpack构建多页应用" class="headerlink" title="使用webpack构建多页应用"></a>使用webpack构建多页应用</h1><ul>
+<li><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2></li>
+</ul>
 <p>随着react, vue, angular 三大前端框架在前端领域地位的稳固，SPA应用正在被应用到越来越多的项目之中。然而在某些特殊的应用场景之中，则需要使用到传统的多页应用。在使用webpack进行项目工程化构建时，也需要对应到调整。<br><a id="more"></a></p>
-<p>##与SPA应用区别</p>
-<p>在SPA应用中，使用 webpack 构建完成项目之后，会生成一个 html 文件，若干个 js 文件，以及若干个 css 文件。在 html 文件中，会引用所有的 js 和 css 文件。\<br>而在多页应用中，使用 webpack 构建完成项目之后，会生成多个 html 文件，多个 js 文件，以及多个 css 文件。在每个 html 文件中，只会引用该页面所对应的 js 和 css 文件。</p>
-<p>##webpack配置</p>
-<p>###入口设置</p>
+<ul>
+<li><h2 id="与SPA应用区别"><a href="#与SPA应用区别" class="headerlink" title="与SPA应用区别"></a>与SPA应用区别</h2></li>
+</ul>
+<p>在SPA应用中，使用 webpack 构建完成项目之后，会生成一个 html 文件，若干个 js 文件，以及若干个 css 文件。在 html 文件中，会引用所有的 js 和 css 文件。<br>而在多页应用中，使用 webpack 构建完成项目之后，会生成多个 html 文件，多个 js 文件，以及多个 css 文件。在每个 html 文件中，只会引用该页面所对应的 js 和 css 文件。</p>
+<ul>
+<li><h2 id="webpack配置"><a href="#webpack配置" class="headerlink" title="webpack配置"></a>webpack配置</h2></li>
+</ul>
+<ul>
+<li><h3 id="入口设置"><a href="#入口设置" class="headerlink" title="入口设置"></a>入口设置</h3></li>
+</ul>
 <p>多页应用的打包会对应多个入口 js 文件，以及多个 html 模版文件。假设我们的开发状态下的多页目录是这样：</p>
 <pre><code>|--page1
     |--index.html
@@ -61,23 +69,32 @@
     |--index.html
     |--index.js
     |--index.less
-</code></pre><p>包括 page1 和 page2 两个页面，以及它们所对应的 js 和 less 文件。那么在使用 webpack 构建项目时，就有 page1-&gt;index.js 和 page2-&gt;index.js 两个入口文件，以及 page1-&gt;index.html 和 page2-&gt;index.html 两个模版文件。然而在构建项目时，不可能针对每一个页面指定一个入口配置。\<br>要自动匹配到所有的页面入口及模版文件，有两种方法。\<br>\<br>方法一：使用 node 的 fs 文件系统。来读取父级文件夹下的所有子文件夹。通过文件夹名称，来自动匹配到所有的页面。然而，这种方式需要保持父级文件夹下文件的干净。否则就需要使用具体的判断逻辑来过滤出所有的入口目录。\<br>\<br>方法二：通过配置文件来配置入口。比如：</p>
+</code></pre><p>包括 page1 和 page2 两个页面，以及它们所对应的 js 和 less 文件。那么在使用 webpack 构建项目时，就有 page1-&gt;index.js 和 page2-&gt;index.js 两个入口文件，以及 page1-&gt;index.html 和 page2-&gt;index.html 两个模版文件。然而在构建项目时，不可能针对每一个页面指定一个入口配置。<br>要自动匹配到所有的页面入口及模版文件，有两种方法。</p>
+<p>方法一：使用 node 的 fs 文件系统。来读取父级文件夹下的所有子文件夹。通过文件夹名称，来自动匹配到所有的页面。然而，这种方式需要保持父级文件夹下文件的干净。否则就需要使用具体的判断逻辑来过滤出所有的入口目录。<br>方法二：通过配置文件来配置入口。比如：</p>
 <p>entry: [‘page1’, ‘page2’];<br>这样便能准确的指定出所有的入口目录。然而却在每次增加页面时，都需要去更改配置文件。\<br>两种方法个有特点，可根据具体情况选择。</p>
-<p>###具体配置</p>
-<p>####entry</p>
+<ul>
+<li><h3 id="具体配置"><a href="#具体配置" class="headerlink" title="具体配置"></a>具体配置</h3></li>
+</ul>
+<ul>
+<li><h4 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h4></li>
+</ul>
 <p>entry的配置需要根据我们获取到的入口数据来循环添加。</p>
 <pre><code>const entryData = {};
 entry.forEach(function (item) {
     entryData[item] = path.join(__dirname, `../src/pages/${item}/index.js`);
 })
-</code></pre><p>####output</p>
+</code></pre><ul>
+<li><h4 id="output"><a href="#output" class="headerlink" title="output"></a>output</h4></li>
+</ul>
 <p>output的配置和SPA应用一致，不需要特殊配置。</p>
 <pre><code>output: {
     filename: &apos;public/[name]_[chunkhash:8].js&apos;,
     path: path.join(__dirname, `../dist/`),
     publicPath: &apos;/&apos;
 },
-</code></pre><p>####HtmlWebpackPlugin</p>
+</code></pre><ul>
+<li><h4 id="HtmlWebpackPlugin"><a href="#HtmlWebpackPlugin" class="headerlink" title="HtmlWebpackPlugin"></a>HtmlWebpackPlugin</h4></li>
+</ul>
 <p>在使用 webpack 构建时。需要使用到 html-webpack-plugin 插件来生成项目模版。对于需要生成多个模版的多页应用来说，也需要生成多个 html 模版文件。同样的，使用获取到的入口文件数据来循环添加。</p>
 <pre><code>const HtmlWebpackPlugin = require(&apos;html-webpack-plugin&apos;);
 const HtmlWebpackPluginData = [];
@@ -91,7 +108,9 @@ entry.forEach(function (item) {
     );
 })      
 </code></pre><p>配置中 chunks 必须配置，如果不配置，会导致每个模版文件中均引入所有的 js 和 css 文件。指定为 entry 中的配置 name，则会只引入该入口相关的文件。</p>
-<p>###配置组合</p>
+<ul>
+<li><h3 id="配置组合"><a href="#配置组合" class="headerlink" title="配置组合"></a>配置组合</h3></li>
+</ul>
 <p>接下来，便是将前面的entry, output, htmlWebpackPlugin的配置组合起来，除此之外的其它配置，跟SPA应用一致，无需做单独处理。组合如下</p>
 <pre><code>modules.exports = {
     entry: { ...entryData },
@@ -109,7 +128,7 @@ entry.forEach(function (item) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/04/13/2019-04-12使用webpack构建多页应用/" data-id="cjuea73o00005r7131btyqwcp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/04/13/2019-04-12使用webpack构建多页应用/" data-id="cjueayhap0005tr13i2s7bp7n" class="article-share-link">Share</a>
       
     </footer>
 
